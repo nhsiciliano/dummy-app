@@ -1,21 +1,33 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
+import favoritesReducer from './favoritesReducer';
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const favoritesSlice = createSlice({
-  name: 'favorites',
-  initialState: [],
-  reducers: {
-    addToFavorites: (state, action) => {
-      state.push(action.payload);
-    },
-  },
-});
+const persistConfig = {
+  key: 'root',
+  version: 1,
+  storage: AsyncStorage,
+}
 
-export const { addToFavorites } = favoritesSlice.actions;
+const persistedReducer = persistReducer(persistConfig, favoritesReducer)
 
-const store = configureStore({
-  reducer: {
-    favorites: favoritesSlice.reducer,
-  },
-});
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
+})
 
-export default store;
+export let persistor = persistStore(store);

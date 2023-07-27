@@ -5,37 +5,119 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
-  Button,
+  Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { addToFavorites } from "../redux/store";
-import { getProduct } from "../services/ProductsService.js";
+import { addToFavorites, addToCart } from '../redux/favoritesReducer';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message'
 
-const ProductDetails = ({ route }) => {
+
+const { width } = Dimensions.get("window");
+const height = width * 0.85;
+
+const ProductDetails = ({ route, navigation }) => {
+
   const dispatch = useDispatch();
   const { productId } = route.params;
-  const [product, setProduct] = useState({});
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
-  const handleAddToFavorites = () => {
-    dispatch(addToFavorites(product));
-  };
+  const showToast = (message) => {
+    Toast.show({
+      type: 'success',
+      text1: message,
+    })
+  }
 
   useEffect(() => {
-    setProduct(getProduct(productId));
-  });
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        axios.get(`https://dummyjson.com/products/${productId}`)
+          .then((json) => setData(json.data))
+          .finally(() => setLoading(false));
+      } catch (error) {
+        setError(true);
+      }
+    };
+    fetchData();
+  }, [])
+
+  const imgUrls = data.images;
 
   return (
     <SafeAreaView>
-      <ScrollView>
-        <Image style={styles.image} source={product.image} />
-        <View style={styles.infoContainer}>
-          <Text style={styles.name}>{product.name}</Text>
-          <Text style={styles.price}>$ {product.price}</Text>
-          <Text style={styles.description}>{product.description}</Text>
-          <Button onPress={handleAddToFavorites} title="Add to Favorites" />
+      <View>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => {
+            navigation.navigate("Products");
+          }}>
+            <FontAwesome5 name="arrow-alt-circle-left" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>{data.title}</Text>
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(
+                addToFavorites({
+                  id: data.id,
+                  thumbnail: data.thumbnail,
+                  title: data.title,
+                  price: data.price,
+                })
+              );
+              showToast('Este producto fue agregado a favoritos');
+            }}
+          >
+            <MaterialIcons name="favorite-border" size={24} color="black" />
+          </TouchableOpacity>
         </View>
-      </ScrollView>
+        <ScrollView
+          horizontal
+          pagingEnabled
+          scrollEventThrottle={18}
+          showsHorizontalScrollIndicator={false}
+          style={{ width, height, marginVertical: 22 }}>
+          {imgUrls?.map((item, index) => (
+            <Image style={{ width, height, resizeMode: "cover" }} key={index} source={{ uri: item }} />
+          ))}
+        </ScrollView>
+        <View style={styles.pagination}>
+          {imgUrls?.map((item, index) => (
+            <Text key={index} style={styles.dot}>⬤</Text>
+          ))}
+        </View>
+        <View style={styles.infoContainer}>
+          <Text style={styles.title}>$ {data.price}</Text>
+          <Text style={styles.info}>Brand: {data.brand}</Text>
+          <Text style={styles.info}>Category: {data.category}</Text>
+          <Text style={styles.info}>Rating: {data.rating}</Text>
+          <Text style={styles.info}>Stock: {data.stock}</Text>
+          <Text style={styles.description}>Description: {data.description}</Text>
+        </View>  
+        <TouchableOpacity
+            style={styles.cartIcon}
+            onPress={() => {
+              dispatch(
+                addToCart({
+                  id: data.id,
+                  thumbnail: data.thumbnail,
+                  title: data.title,
+                  price: data.price,
+                })
+              );
+              showToast('Este producto fue marcado como comprado');
+            }}
+          >
+            <AntDesign name="shoppingcart" size={28} color="black" />
+          </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -56,6 +138,12 @@ const styles = StyleSheet.create({
     elevation: 1,
     marginVertical: 20,
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: 18,
+  },
   image: {
     height: 300,
     width: "100%",
@@ -63,19 +151,37 @@ const styles = StyleSheet.create({
   infoContainer: {
     padding: 16,
   },
-  name: {
-    fontSize: 22,
+  title: {
+    fontSize: 20,
     fontWeight: "bold",
+    marginVertical: 8,
   },
-  price: {
+  info: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 8,
+    marginVertical: 4,
+    color: "#324B4A",
   },
   description: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "400",
-    color: "#787878",
-    marginBottom: 16,
+    color: "#324B4A",
+    marginVertical: 10,
   },
+  pagination: {
+    flexDirection: "row",
+    position: "absolute",
+    bottom: 300,
+    alignSelf: "center",
+    margin: 2,
+  },
+  dot: {
+    fontSize: 12,
+    color: "#888",
+    marginHorizontal: 2,
+  },
+  cartIcon: {
+    left: 340,
+    bottom: 245,
+  }
 });
