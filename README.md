@@ -19,6 +19,9 @@ La navegación esta diseñada mediante createNativeStackNavigator y createBottom
 y marcar los productos como comprados están hechos mediante React-Redux y Redux Toolkit. La persistencia en la navegación está incorporada
 con redux-persist.
 
+Las pruebas fueran realizadas con la libreria Jest y se basan en el chequeo del estado inicial de favoritos y en la prueba de verificar si
+se dispara la acción correcta y su funcionamiento al agregar un nuevo producto al estado de favoritos.
+
 ## Acceso al proyecto
 
 1. Clona el código
@@ -33,4 +36,10 @@ con redux-persist.
 
    `npx expo start`
 
-4. Puedes iniciar este proyecto en dispositivos IOS: tecla `i` o en dispositivos Android: tecla `a`
+4. Puedes iniciar este proyecto en dispositivos
+
+   IOS: tecla `i` o en dispositivos Android: tecla `a`
+
+5. Inicia las pruebas realizadas con Jest
+
+   `npm run test`
