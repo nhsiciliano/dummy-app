@@ -23,7 +23,7 @@ con redux-persist.
 
 1. Clona el código
 
-   `git clone`
+   `git clone https://github.com/nhsiciliano/dummy-app.git`
 
 2. Instala las dependencias de desarrollo
 
