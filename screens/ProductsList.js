@@ -62,6 +62,12 @@ const ProductsList = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         renderItem={renderProduct}
       />
+      <View>
+        {loading && <Text style={styles.listWaiting}>Please wait...</Text>}
+      </View>
+      <View>
+        {error && <Text style={styles.listWaiting}>Something went wrong</Text>}
+      </View>
     </SafeAreaView>
   );
 };
@@ -89,4 +95,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     marginHorizontal: 12,
   },
+  listWaiting: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 290,
+  }
 });

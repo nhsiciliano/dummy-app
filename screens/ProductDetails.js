@@ -100,23 +100,29 @@ const ProductDetails = ({ route, navigation }) => {
           <Text style={styles.info}>Rating: {data.rating}</Text>
           <Text style={styles.info}>Stock: {data.stock}</Text>
           <Text style={styles.description}>Description: {data.description}</Text>
-        </View>  
+        </View>
         <TouchableOpacity
-            style={styles.cartIcon}
-            onPress={() => {
-              dispatch(
-                addToCart({
-                  id: data.id,
-                  thumbnail: data.thumbnail,
-                  title: data.title,
-                  price: data.price,
-                })
-              );
-              showToast('Este producto fue marcado como comprado');
-            }}
-          >
-            <AntDesign name="shoppingcart" size={28} color="black" />
-          </TouchableOpacity>
+          style={styles.cartIcon}
+          onPress={() => {
+            dispatch(
+              addToCart({
+                id: data.id,
+                thumbnail: data.thumbnail,
+                title: data.title,
+                price: data.price,
+              })
+            );
+            showToast('Este producto fue marcado como comprado');
+          }}
+        >
+          <AntDesign name="shoppingcart" size={28} color="black" />
+        </TouchableOpacity>
+      </View>
+      <View>
+        {loading && <Text style={styles.listWaiting}>Please wait...</Text>}
+      </View>
+      <View>
+        {error && <Text style={styles.listWaiting}>Something went wrong</Text>}
       </View>
     </SafeAreaView>
   );
@@ -183,5 +189,12 @@ const styles = StyleSheet.create({
   cartIcon: {
     left: 340,
     bottom: 245,
+  },
+  listWaiting: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 290,
   }
 });
